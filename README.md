@@ -13,6 +13,7 @@ Cam is a docker for the UI-3251LE-C-HQ IDS Camera to run with ROS
 6. use this command to run the docker file: docker run -it --privileged -v "data:/catkin_ws/data" --device=/dev/bus/usb/002 -e "DISPLAY" -e "QT_X11_NO_MITSHM=1" -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" -v "data:/catkin_ws/data" --net=host cam:latest /usr/sbin/init
 
 Note: the device and tag may differ from computer to computer
+
 7. Run sudo /etc/init.d/ueyeusbdrc start and sudo /etc/init.d/ueyeethdrc start
 8. Run source /opt/ros/noetic/setup.bash and devel/setup.bash
 9. Run roslaunch ueye_cam rgb8.launch
