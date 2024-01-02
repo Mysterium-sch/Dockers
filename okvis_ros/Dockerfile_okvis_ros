@@ -1,0 +1,61 @@
+FROM osrf/ros:kinetic-desktop-full
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -y &&\
+	apt-get install -y \
+	cmake \
+	libgoogle-glog-dev \
+	git \
+	wget \
+	zip \
+	unzip \
+    vim \
+	curl \
+	dpkg \
+	gnupg
+
+RUN apt-get install -y --allow-unauthenticated \ 
+	ros-kinetic-catkin \
+	python-catkin-tools \
+	libsuitesparse-dev
+
+RUN apt install ros-kinetic-pcl-ros &&\
+	apt install pcl-tools
+
+RUN apt install -y libgoogle-glog-dev libatlas-base-dev libeigen3-dev
+RUN apt-get install -y libatlas-base-dev libeigen3-dev libsuitesparse-dev 
+RUN apt-get install -y libopencv-dev libboost-dev libboost-filesystem-dev
+RUN apt-get install -y libopencv-dev
+
+RUN  git clone https://github.com/ethz-asl/libvisensor.git &&\
+  cd libvisensor &&\
+  ./install_libvisensor.sh
+
+RUN rosdep update
+
+RUN export PYTHONPATH=/usr/local/opencv/3.4.3/:$PYTHONPATH
+
+ENV WORKSPACE /catkin_ws
+
+RUN mkdir -p $WORKSPACE/src && \
+	mkdir -p $WORKSPACE/ueye &&\
+	cd $WORKSPACE
+
+RUN mkdir -p  $WORKSPACE/build &&\
+	cd $WORKSPACE/src &&\
+	wget https://www.doc.ic.ac.uk/~sleutene/software/okvis_ros-1.1.3.zip --no-check-certificate &&\
+	unzip okvis_ros-1.1.3.zip && rm okvis_ros-1.1.3.zip
+
+RUN mkdir -p $WORKSPACE/src && \
+	cd $WORKSPACE && \
+	catkin init && \
+	catkin config --extend /opt/ros/kinetic && \
+	catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+RUN	cd $WORKSPACE &&\
+	catkin build -j$(nproc)
+
+ENTRYPOINT cd $WORKSPACE &&\
+	/bin/bash
+
