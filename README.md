@@ -6,7 +6,7 @@ Cam is a docker for the UI-3251LE-C-HQ IDS Camera to run with ROS
 
 1. Download appropriate dockerfile and ids software (they need to be in same directory)
 2. extract the tds software to the directory with the dockerfile
-3. Build dockerfile
+3. Build dockerfile (docker build . -f Dockerfile_Cam -t cam)
 4. create data foulder in same directory
 5. Run xhost +local:root
 4. In another terminal run sudo dockerd
