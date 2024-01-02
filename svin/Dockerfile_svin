@@ -1,0 +1,77 @@
+FROM osrf/ros:noetic-desktop-full
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -y &&\
+	apt-get install -y \
+	python3.6 \
+	cmake \
+	libgoogle-glog-dev \
+	git \
+	wget \
+	zip \
+	unzip \
+    vim \
+	curl \
+	dpkg \
+	python3-rosdep \
+	gnupg \
+	python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential \
+	python3-catkin-tools python3-osrf-pycommon \
+	ros-noetic-catkin \
+	ros-noetic-tf2-sensor-msgs \
+	libcxsparse3
+
+RUN git clone https://github.com/laurentkneip/opengv
+
+RUN cd opengv &&\
+	mkdir build &&\
+	cd build &&\
+	cmake .. && make
+
+RUN apt install -y libgoogle-glog-dev libatlas-base-dev libeigen3-dev
+RUN apt-get install -y libatlas-base-dev libeigen3-dev libsuitesparse-dev 
+RUN apt-get install -y libopencv-dev libboost-dev libboost-filesystem-dev
+RUN apt-get install -y libopencv-dev
+
+RUN  git clone https://github.com/ethz-asl/libvisensor.git &&\
+  cd libvisensor &&\
+  ./install_libvisensor.sh
+
+RUN rosdep update
+
+ENV WORKSPACE /catkin_ws
+
+RUN mkdir -p $WORKSPACE/src && \
+	mkdir -p $WORKSPACE/build
+
+RUN  cd $WORKSPACE &&\
+	git clone https://github.com/ceres-solver/ceres-solver.git &&\  
+	cd ceres-solver &&\ 
+	git checkout 1.14.x &&\ 
+ 	mkdir -p  build &&\ 
+  	cd build &&\ 
+  	cmake -DCMAKE_BUILD_TYPE=Release .. &&\ 
+  	make -j1 &&\ 
+  	make install -j1
+
+RUN cd $WORKSPACE &&\
+	wget https://www.doc.ic.ac.uk/~sleutene/software/brisk-2.0.8.zip &&\ 
+  	unzip brisk-2.0.8.zip &&\ 
+  	cd brisk &&\ 
+  	mkdir build  &&\ 
+  	cd build  &&\ 
+  	cmake -DCMAKE_BUILD_TYPE=Release ..  &&\ 
+  	make -j1  &&\ 
+  	make install -j1
+
+RUN  rm $WORKSPACE/brisk-2.0.8.zip
+
+RUN mkdir -p $WORKSPACE/src  &&\
+  cd $WORKSPACE/src  &&\
+  git clone --branch 0.2 https://github.com/AutonomousFieldRoboticsLab/SVIn.git  &&\
+  git clone https://github.com/AutonomousFieldRoboticsLab/imagenex831l.git
+
+ENTRYPOINT cd $WORKSPACE &&\
+	/bin/bash
+
