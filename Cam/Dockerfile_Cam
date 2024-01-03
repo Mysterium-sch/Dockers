@@ -1,7 +1,7 @@
 FROM 18r441m/ros:noetic-desktop-full
 
 RUN apt-get update -y &&\
-	apt-get install -y \
+	apt-get install -y --allow-unauthenticated \
 	cmake \
 	libgoogle-glog-dev \
 	git \
@@ -13,22 +13,35 @@ RUN apt-get update -y &&\
 	dpkg \
 	gnupg \
 	libomp5-8 \
-	libffi-dev
+	libffi-dev \
+	lib32z1 \
+	software-properties-common \
+	freeglut3-dev \
+	libjpeg-dev \
+	libpng-dev \
+	libusb-dev \
+	libatomic-ops-dev \
+	udev \
+	libc6-dev \
+	libncursesw5-dev \
+	build-essential \
+	systemd \
+	qtcreator \
+	qtbase5-dev \
+	qt5-qmake \
+	python3-catkin-pkg \
+	ros-noetic-catkin &&\
+	apt-get upgrade &&\
+	apt-get autoremove
+
+RUN add-apt-repository ppa:ondrej/php
+RUN apt-get install -y php7.3
 
 RUN ln -s /usr/lib64/libomp.so /usr/lib64/libomp.so.5
 
 RUN apt-get update && \
     apt-get install -y libqt5gui5 && \
     rm -rf /var/lib/apt/lists/*
-
-RUN apt-get install systemd
-
-RUN apt install python3-catkin-pkg
-
-RUN apt-get install -y build-essential
-
-RUN apt-get install -y --allow-unauthenticated \ 
-	ros-noetic-catkin
 
 RUN wget https://bootstrap.pypa.io/get-pip.py &&\
 python3 ./get-pip.py
