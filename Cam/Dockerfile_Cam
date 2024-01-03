@@ -36,7 +36,7 @@ RUN apt-get update -y &&\
 
 RUN add-apt-repository ppa:ondrej/php
 RUN apt-get install -y php7.3
-
+RUN apt-get -y install usbutils
 RUN ln -s /usr/lib64/libomp.so /usr/lib64/libomp.so.5
 
 RUN apt-get update && \
