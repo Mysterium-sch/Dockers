@@ -41,10 +41,3 @@ RUN apt -y install ros-foxy-ros-base python3-argcomplete &&\
     apt -y install ros-foxy-desktop python3-argcomplete
     
 RUN apt -y install ros-dev-tools
-
-RUN mkdir /catkin_ws
-
-ENTRYPOINT /catkin_ws &&\
-	/bin/bash
-
-
