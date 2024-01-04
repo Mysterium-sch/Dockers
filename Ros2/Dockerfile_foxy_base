@@ -38,6 +38,7 @@ RUN apt -y install ros-dev-tools
 
 RUN mkdir /catkin_ws
 
-ENTRYPOINT /catkin_ws
+ENTRYPOINT /catkin_ws &&\
+	/bin/bash
 
 

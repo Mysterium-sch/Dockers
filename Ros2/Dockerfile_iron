@@ -58,6 +58,7 @@ RUN cd ~/ros2_iron &&\
 
 RUN mkdir /catkin_ws
 
-ENTRYPOINT /catkin_ws
+ENTRYPOINT /catkin_ws&&\
+	/bin/bash
 
 
