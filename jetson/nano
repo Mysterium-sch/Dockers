@@ -1,9 +1,11 @@
 FROM nvidia/cuda:12.3.1-base-ubuntu20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND teletype
 ENV TZ=Etc/UTC
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV ROS_DISTRO=noetic
+ARG TARGETPLATFORM
 
 RUN apt-get update && apt-get install -y --no-install-recommends gnupg2 dirmngr && \
     apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 && \
@@ -40,27 +42,33 @@ RUN apt-get update && apt-get install -y \
     ros-noetic-wfov-camera-msgs \
     ros-noetic-roscpp
 
+RUN apt-get -y install libusb-1.0-0
+
 RUN rosdep init &&\
     rosdep update
 
 ENV WORKSPACE /catkin_ws
 
+RUN apt-get -y update
+
 RUN mkdir -p $WORKSPACE/src && \
 	mkdir -p $WORKSPACE/build
 
 RUN  cd $WORKSPACE/src &&\
-	git clone https://github.com/Mysterium-sch/flir_camera_driver.git &&\
+	git clone https://github.com/ros-drivers/flir_camera_driver.git &&\
     cd flir_camera_driver &&\ 
-	git checkout noetic
+	git checkout noetic-devel
+	
+RUN cd $WORKSPACE/src/flir_camera_driver/spinnaker_camera_driver/cmake &&\
+	sed -i 's%usr/lib%opt/spinnaker/lib%g' DownloadSpinnaker.cmake
 
 RUN cd $WORKSPACE && \
 	catkin init && \
 	catkin config --extend /opt/ros/noetic && \
 	catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-RUN	cd $WORKSPACE &&\
+RUN cd $WORKSPACE &&\
 	catkin build -j$(nproc)
 
 ENTRYPOINT cd $WORKSPACE &&\
 	/bin/bash
-
