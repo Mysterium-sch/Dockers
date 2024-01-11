@@ -1,25 +1,20 @@
 Instructions for each Docker
 
-Cam:
+Jetson:
 
-Cam is a docker for the UI-3251LE-C-HQ IDS Camera to run with ROS
+Jetson is a docker that contains the flir_camera_driver for noetic ROS
 
-1. Download appropriate dockerfile and ids software (they need to be in same directory)
-2. extract the tds software to the directory with the dockerfile
-3. Build dockerfile (docker build . -f Dockerfile_Cam -t cam)
-4. create data foulder in same directory
-5. Run xhost +local:root
-4. In another terminal run sudo dockerd
-6. use this command to run the docker file: docker run -it --privileged -v "data:/catkin_ws/data" --device=/dev/bus/usb/002/016 -e "DISPLAY" -e "QT_X11_NO_MITSHM=1" -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" --net=host cam:latest /usr/sbin/init
-
-Note: the device and tag may differ from computer to computer
-
-7. Run sudo /etc/init.d/ueyeusbdrc start and sudo /etc/init.d/ueyeethdrc start
-8. Run source /opt/ros/noetic/setup.bash and devel/setup.bash
-9. Run roslaunch ueye_cam rgb8.launch
-
-This should launch the camera 
-
+1. Download the appropriate dockerfile (Jetson -> nano)
+2. Download the 2.2.0.48 Spinnacker SDK and extract it to the same directory as the dockerfile
+ii. Go inside the spinnacker directory and then inside the folder with the proper aritecture
+ii. extract the tar.gz
+3. Build the docker file
+4. Run the docker image
+ii. Once inside, go inside the spinnacker directory, then the proper aritecture, then proceed to the location of the install file
+ii. Run the install script
+ii. cd /catkin_ws
+ii. source /opt/ros/noetic/setup.bash
+ii. catkin_make
 
 Okvis:
 
