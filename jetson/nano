@@ -40,7 +40,8 @@ RUN apt-get update && apt-get install -y \
     ros-noetic-nodelet \
     ros-noetic-sensor-msgs \
     ros-noetic-wfov-camera-msgs \
-    ros-noetic-roscpp
+    ros-noetic-roscpp \
+    python3-colcon-common-extensions
 
 RUN apt-get -y install libusb-1.0-0
 
@@ -62,13 +63,18 @@ RUN  cd $WORKSPACE/src &&\
 RUN cd $WORKSPACE/src/flir_camera_driver/spinnaker_camera_driver/cmake &&\
 	sed -i 's%usr/lib%opt/spinnaker/lib%g' DownloadSpinnaker.cmake
 
+RUN cd $WORKSPACE &&\
+	rosdep install --from-paths src --ignore-src
+
 RUN cd $WORKSPACE && \
 	catkin init && \
 	catkin config --extend /opt/ros/noetic && \
-	catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+	catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release -DUBUNTU_VERSION=2004
 
-RUN cd $WORKSPACE &&\
-	catkin build -j$(nproc)
+COPY *Spinnaker-2.2.0.48-Linux $WORKSPACE/spinnaker
 
+#RUN cd $WORKSPACE &&\
+#	catkin build -j$(nproc)
+	
 ENTRYPOINT cd $WORKSPACE &&\
 	/bin/bash
