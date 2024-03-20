@@ -1,6 +1,7 @@
 Instructions for Okvis Docker
 
 These steps are for after launching the docker and running it
+
 instructions for okvis_ros found here: https://github.com/ethz-asl/okvis_ros
 
 1. Modify the okvis_node_synchronous to the correct camera and imu topics

@@ -1,6 +1,7 @@
 Instructions for basalt Docker
 
 These steps are for after launching the docker and running it
+
 instructions for orb_slam3 found here: https://github.com/VladyslavUsenko/basalt-mirror/tree/master
 
 1. run these commands:

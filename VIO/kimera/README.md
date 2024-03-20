@@ -1,6 +1,7 @@
 Instructions for Kimera Docker
 
 These steps are for after launching the docker and running it
+
 instructions for kimera found here: https://github.com/MIT-SPARK/Kimera-VIO-ROS
 
 1. Modify the respective launch files
