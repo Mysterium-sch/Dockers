@@ -22,6 +22,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcanberra-gtk3-module \
     ros-noetic-pcl-ros \
     ros-noetic-tf2-sensor-msgs \
+    python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential \
+    python3-catkin-tools python3-osrf-pycommon \
     libgoogle-glog-dev \
     libatlas-base-dev \
     libeigen3-dev \
@@ -63,12 +65,20 @@ RUN sudo git clone https://github.com/laurentkneip/opengv.git && \
     sudo make -j$(nproc) && \
     sudo make install
 
-RUN mkdir -p /svin_ws/src && \
-    cd /svin_ws/src && \
-    git clone --branch 0.2 https://github.com/18r441m/SVIn.git && \
+ENV WORKSPACE /svin_ws
+
+
+RUN mkdir -p /svin_ws/src
+
+RUN    cd /svin_ws/src && \
+    git clone --branch 0.2 https://github.com/Mysterium-sch/SVIn.git && \
     git clone https://github.com/AutonomousFieldRoboticsLab/imagenex831l.git && \
     git clone --branch ros-noetic https://github.com/AutonomousFieldRoboticsLab/sonar_rviz_plugin.git
-
+    
+RUN cd /svin_ws/src/SVIn &&\
+	rm -r pose_graph
+	
+	
 WORKDIR /svin_ws
 
-#RUN /bin/bash -c '. /opt/ros/$ROS_DISTRO/setup.bash; catkin_make'
+#RUN /bin/bash -c '. /opt/ros/$ROS_DISTRO/setup.bash'

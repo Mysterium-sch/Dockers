@@ -1,0 +1,67 @@
+FROM osrf/ros:noetic-desktop-full
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+
+RUN apt-get update -y &&\
+	apt-get install -y \
+	git \
+	wget \
+	zip \
+	unzip \
+    vim \
+	curl \
+	dpkg \
+	gnupg \
+	ssh \
+	python3-pip \
+	python3-opencv \
+	software-properties-common \
+	apt-transport-https ca-certificates
+	
+RUN apt update   &&\
+	wget -c http://archive.ubuntu.com/ubuntu/pool/universe/f/fmtlib/libfmt-dev_4.0.0+ds-2_amd64.deb    &&\
+	apt install -y ./libfmt-dev_4.0.0+ds-2_amd64.deb 
+	
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add - &&\
+	 apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main' &&\
+	 apt-get update &&\
+	 apt install -y cmake &&\
+	 apt install -y cmake-curses-gui  # Recommended, includes ccmake.
+
+RUN apt-get install -y --allow-unauthenticated \ 
+	ros-noetic-catkin \
+	python3-catkin-tools \
+	libsuitesparse-dev
+	
+RUN apt install ros-noetic-pcl-ros &&\
+	apt install pcl-tools
+
+RUN apt-get install -y freeglut3-dev libglew-dev
+
+RUN apt install -y libgoogle-glog-dev libatlas-base-dev libeigen3-dev \
+    libatlas-base-dev libsuitesparse-dev \
+    libopencv-dev libboost-dev libboost-filesystem-dev libboost-all-dev libceres-dev
+
+RUN rosdep update
+
+ENV WORKSPACE /catkin_ws
+
+RUN mkdir -p $WORKSPACE/src
+
+RUN mkdir /root/.ssh && chmod 0700 /root/.ssh &&\
+	ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
+	
+RUN cd /catkin_ws/src &&\
+	git clone --recursive https://gitlab.com/VladyslavUsenko/basalt.git &&\
+	cd basalt &&\
+	./scripts/install_deps.sh &&\
+	mkdir build &&\
+	cd build &&\
+	cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo &&\
+	make -j8
+
+
+ENTRYPOINT cd $WORKSPACE &&\
+	/bin/bash
+

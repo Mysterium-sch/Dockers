@@ -63,12 +63,19 @@ RUN sudo git clone https://github.com/laurentkneip/opengv.git && \
     sudo make -j$(nproc) && \
     sudo make install
 
+ENV WORKSPACE /svin_ws
+
 RUN mkdir -p /svin_ws/src && \
     cd /svin_ws/src && \
-    git clone --branch 0.2 https://github.com/18r441m/SVIn.git && \
+    git clone https://github.com/Mysterium-sch/SVIn.git && \
+    cd SVIn &&\
+    git checkout test &&\
+    cd .. &&\
     git clone https://github.com/AutonomousFieldRoboticsLab/imagenex831l.git && \
     git clone --branch ros-noetic https://github.com/AutonomousFieldRoboticsLab/sonar_rviz_plugin.git
 
+RUN cd /svin_ws/src/SVIn &&\
+	rm -r okvis_ros
+
 WORKDIR /svin_ws
 
-#RUN /bin/bash -c '. /opt/ros/$ROS_DISTRO/setup.bash; catkin_make'

@@ -1,0 +1,54 @@
+FROM 18r441m/ros:noetic-desktop-full
+
+ENV UBUNTU_VERSION focal
+ENV ROS_VERSION noetic
+ENV CATKIN_WS /maplab_ws
+
+RUN apt-get update &&\
+	apt install -y software-properties-common \
+	git \
+	wget
+
+RUN add-apt-repository "deb http://packages.ros.org/ros/ubuntu $UBUNTU_VERSION main"
+
+RUN wget https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -O - | sudo apt-key add -
+RUN apt update
+RUN apt install -y ros-$ROS_VERSION-desktop-full "ros-$ROS_VERSION-tf2-*" "ros-$ROS_VERSION-camera-info-manager*" --yes
+
+
+RUN apt install -y autotools-dev ccache doxygen dh-autoreconf git liblapack-dev libblas-dev libgtest-dev libreadline-dev libssh2-1-dev pylint clang-format-6.0 python3-autopep8 python3-catkin-tools python3-pip python3-git python3-setuptools python3-termcolor python3-wstool libatlas3-base libv4l-dev --yes
+
+RUN pip install requests
+
+RUN pip install -U rosdep
+
+RUN rosdep init &&\
+	rosdep update &&\
+	echo ". /opt/ros/$ROS_VERSION/setup.bash" >> ~/.bashrc
+	
+RUN apt install -y ccache &&\
+	echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc &&\
+	ccache --max-size=10G
+	
+RUN mkdir -p $CATKIN_WS/src &&\
+	cd $CATKIN_WS &&\
+	catkin init &&\
+	catkin config --merge-devel &&\
+	catkin config --extend /opt/ros/$ROS_VERSION &&\
+	catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release &&\
+	catkin config --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS=-fdiagnostics-color
+
+RUN mkdir /root/.ssh && chmod 0700 /root/.ssh &&\
+	ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
+	
+RUN cd $CATKIN_WS/src &&\
+	git clone git@github.com:ethz-asl/maplab.git --recursive -b develop &&\
+	cd maplab &&\
+	./dependencies/internal/linter/init-git-hooks.py
+
+RUN cd $CATKIN_WS &&\
+	catkin build maplab
+
+ENTRYPOINT cd $CATKIN_WS &&\
+	/bin/bash
+

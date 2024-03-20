@@ -1,0 +1,66 @@
+FROM osrf/ros:kinetic-desktop-full
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -y &&\
+	apt-get install -y \
+	cmake \
+	git \
+	wget \
+	zip \
+	unzip \
+    vim \
+	curl \
+	dpkg \
+	gnupg \
+	ssh \
+	python3-pip
+
+RUN apt-get install -y --allow-unauthenticated \ 
+	ros-kinetic-catkin \
+	python-catkin-tools \
+	libsuitesparse-dev
+	
+RUN apt install ros-kinetic-pcl-ros &&\
+	apt install pcl-tools
+
+RUN apt-get install -y freeglut3-dev libglew-dev
+
+RUN apt install -y libgoogle-glog-dev libatlas-base-dev libeigen3-dev \
+    libatlas-base-dev libsuitesparse-dev \
+    libopencv-dev libboost-dev libboost-filesystem-dev libboost-all-dev libceres-dev
+
+RUN rosdep update
+
+RUN export PYTHONPATH=/usr/local/opencv/2.4.9/:$PYTHONPATH
+
+ENV WORKSPACE /catkin_ws
+
+RUN mkdir -p $WORKSPACE/src
+
+RUN mkdir /root/.ssh && chmod 0700 /root/.ssh &&\
+	ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
+	
+RUN  git clone https://github.com/ethz-asl/kindr.git &&\
+	cd kindr &&\
+	mkdir build && cd build &&\
+	cmake .. &&\
+	make install
+
+RUN mkdir -p  $WORKSPACE/build &&\
+	cd $WORKSPACE/src &&\
+	git clone https://github.com/ethz-asl/rovio.git &&\
+	cd rovio &&\
+	git submodule update --init --recursive &&\
+	git clone https://github.com/ethz-asl/maplab_lightweight_filtering.git
+
+
+RUN mkdir -p $WORKSPACE/src && \
+	cd $WORKSPACE && \
+	catkin init && \
+	catkin config --extend /opt/ros/kinetic && \
+	catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+ENTRYPOINT cd $WORKSPACE &&\
+	/bin/bash
+

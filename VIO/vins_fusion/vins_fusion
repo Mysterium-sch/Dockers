@@ -1,0 +1,79 @@
+FROM osrf/ros:kinetic-desktop-full
+ 
+ARG DEBIAN_FRONTEND=noninteractive
+ 
+RUN apt-get update -y &&\
+	apt-get install -y \
+    cmake \
+	git \
+	wget \
+	zip \
+	unzip \
+    vim \
+	curl \
+	dpkg \
+	gnupg \
+	ssh \
+	python-pip
+ 
+RUN apt-get install -y --allow-unauthenticated \ 
+	ros-kinetic-catkin \
+	python-catkin-tools \
+	libsuitesparse-dev
+RUN apt install ros-kinetic-pcl-ros &&\
+	apt install pcl-tools
+ 
+RUN apt-get install -y freeglut3-dev libglew-dev
+ 
+RUN apt install -y libgoogle-glog-dev libatlas-base-dev libeigen3-dev \
+    libatlas-base-dev libsuitesparse-dev \
+    libopencv-dev libboost-dev libboost-filesystem-dev libboost-all-dev libceres-dev
+ 
+RUN rosdep update
+ 
+RUN apt-get update && apt-get install -y \
+      cmake \
+      libatlas-base-dev \
+      libeigen3-dev \
+      libgoogle-glog-dev \
+      libsuitesparse-dev \
+      python-catkin-tools \
+      ros-kinetic-cv-bridge \
+      ros-kinetic-image-transport \
+      ros-kinetic-message-filters \
+      ros-kinetic-tf && \
+      rm -rf /var/lib/apt/lists/* && \
+      # Build and install Ceres
+      git clone https://github.com/ceres-solver/ceres-solver.git && \
+      cd ceres-solver && \
+      git checkout 1.14.x && \
+      mkdir build && cd build && \
+      cmake .. && \
+      make -j$(USE_PROC) install && \
+      rm -rf ../../ceres-solver && \
+      mkdir -p $CATKIN_WS/src/VINS-Fusion/
+ 
+RUN export PYTHONPATH=/usr/local/opencv/2.4.9/:$PYTHONPATH
+ 
+ENV WORKSPACE /catkin_ws
+ 
+RUN mkdir -p $WORKSPACE/src
+ 
+RUN mkdir /root/.ssh && chmod 0700 /root/.ssh &&\
+	ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
+RUN mkdir -p  $WORKSPACE/build &&\
+	cd $WORKSPACE/src &&\
+	git clone https://github.com/HKUST-Aerial-Robotics/VINS-Fusion.git
+ 
+ 
+RUN mkdir -p $WORKSPACE/src && \
+	cd $WORKSPACE && \
+	catkin init && \
+	catkin config --extend /opt/ros/kinetic && \
+	catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+ 
+RUN	cd $WORKSPACE &&\
+	catkin build -j$(nproc)
+ 
+ENTRYPOINT cd $WORKSPACE &&\
+	/bin/bash
