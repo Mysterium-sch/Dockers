@@ -20,9 +20,9 @@ RUN apt-get update && apt-get install -y \
     tmux \
     wget \
     curl \
-    i2c-tools \
-    python3-smbus2 \
     vim \
+    python3-smbus2 \
+    i2c-tools \
     build-essential && \
     rm -rf /var/lib/apt/lists/*
 
@@ -73,6 +73,7 @@ RUN mkdir -p /ws/src && \
 	mv ms5837-python/ms5837 ./ &&\
 	sudo rm -r ms5837-python/*.py
 	 
+RUN apt-get install -y python3-opencv
 
 WORKDIR /ws
 
@@ -80,10 +81,13 @@ RUN apt-get update && apt-get install -y ros-humble-ament-cmake
 
 RUN rosdep install --from-paths src --ignore-src -y
 
+RUN cd src/ &&\
+    git clone https://github.com/Mysterium-sch/ros2_bringup.git &&\
+    git clone https://github.com/Mysterium-sch/imagenex831l_ROS2.git
+
 RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
-    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && \
+    colcon build && \
     . install/setup.bash"
-    
 
 RUN echo '#!/bin/bash\nset -e\nsource "/opt/ros/humble/setup.bash"\nexec "$@"' > /ros_entrypoint.sh && \
     chmod +x /ros_entrypoint.sh
