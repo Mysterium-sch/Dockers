@@ -77,7 +77,7 @@ RUN apt-get install -y python3-opencv
 
 WORKDIR /ws
 
-RUN apt-get update && apt-get install -y ros-humble-ament-cmake
+RUN apt-get update && apt-get install -y ros-humble-ament-cmake ros-humble-control-msgs
 
 RUN rosdep install --from-paths src --ignore-src -y
 
