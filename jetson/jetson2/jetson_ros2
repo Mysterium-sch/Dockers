@@ -66,7 +66,7 @@ RUN apt-get update && apt-get install -y ros-${ROS_DISTRO}-spinnaker-camera-driv
 
 RUN mkdir -p /ws/src && \
     cd /ws/src && \
-    git clone --branch humble-devel https://github.com/ros-drivers/flir_camera_driver &&\
+    git clone --branch humble-devel https://github.com/Mysterium-sch/flir_camera_driver.git &&\
     git clone --recursive --branch ros2 https://github.com/Mysterium-sch/microstrain_inertial.git &&\
     git clone -b master --recursive https://github.com/tasada038/ms5837_bar_ros.git &&\
     cd ./ms5837_bar_ros/ms5837_bar_ros/ &&\
