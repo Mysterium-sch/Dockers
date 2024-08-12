@@ -62,12 +62,10 @@ RUN mkdir -p /opt/ros2_ws/src && \
     vcs import src --input https://raw.githubusercontent.com/ros2/ros2/humble/ros2.repos && \
     /bin/bash -c '. /opt/ros/humble/setup.bash && rosdep install --from-paths src --ignore-src -y --skip-keys "fastcdr rti-connext-dds-6.0.1 urdfdom_headers"'
 
-RUN apt-get update && apt-get install -y ros-${ROS_DISTRO}-spinnaker-camera-driver
-
 RUN mkdir -p /ws/src && \
     cd /ws/src && \
-    git clone https://github.com/Mysterium-sch/flir_camera_driver.git &&\
     git clone --recursive --branch ros2 https://github.com/Mysterium-sch/microstrain_inertial.git &&\
+    git clone -b humble-devel https://github.com/18r441m/flir_camera_driver.git &&\
     git clone -b master --recursive https://github.com/tasada038/ms5837_bar_ros.git &&\
     cd ./ms5837_bar_ros/ms5837_bar_ros/ &&\
     mv ms5837-python/ms5837 ./ &&\
@@ -77,9 +75,11 @@ RUN apt-get install -y python3-opencv
 
 WORKDIR /ws
 
-RUN apt-get update && apt-get install -y ros-humble-ament-cmake ros-humble-control-msgs
+RUN apt-get update && apt-get install -y ros-humble-ament-cmake ros-humble-control-msgs iputils-ping
 
 RUN rosdep install --from-paths src --ignore-src -y
+
+RUN echo 29
 
 RUN cd src/ &&\
     git clone https://github.com/Mysterium-sch/ros2_bringup.git &&\
@@ -99,4 +99,3 @@ RUN chmod +x /launch.sh
 ENTRYPOINT ["/ros_entrypoint.sh"]
 
 CMD ["/launch.sh"]
-
